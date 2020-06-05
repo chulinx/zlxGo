@@ -1,11 +1,11 @@
 # zlxGo
 > 自己的golang依赖库
 
-``stringfile  github.com/tianyazc/zlxGo/zlxmodule/stringfile``
+``stringfile github.com/chulinx/zlxGo/stringfile``
 
-``color github.com/tianyazc/zlxGo/zlxmodule/color``
+``color github.com/chulinx/zlxGo/color``
 
-``yaml github.com/tianyazc/zlxGo/zlxmodule/yaml``
+``yaml github.com/chulinx/zlxGo/yaml``
 
 ## Ex:
 #### config file
@@ -23,7 +23,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/tianyazc/zlxGo/zlxmodule/yaml"
+	"github.com/chulinx/zlxGo/yaml"
 )
 
 func main() {

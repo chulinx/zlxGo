@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="5ff5aa9b-faa9-4b3f-94fb-429bb5d09d23" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" path="/usr/local/Cellar/go/1.14.1/libexec" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1c4TFkFJVqkAM79TkcLykxDEVm5" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="GO_FMT" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.gopath.indexing.explicitly.defined" value="true" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="go.vgo" />
+  </component>
+  <component name="RunManager">
+    <configuration name="TestYaml in github.com/tianyazc/zlxGo/zlxmodule/yaml" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="zlxGo" />
+      <working_directory value="$PROJECT_DIR$/zlxmodule/yaml" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/tianyazc/zlxGo/zlxmodule/yaml" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestYaml$" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Test.TestYaml in github.com/tianyazc/zlxGo/zlxmodule/yaml" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="sync code" />
+    <option name="LAST_COMMIT_MESSAGE" value="sync code" />
+  </component>
+  <component name="VgoProject">
+    <integration-enabled>true</integration-enabled>
+    <environment>
+      <map>
+        <entry key="GOPROXY" value="https://mirrors.aliyun.com/goproxy/" />
+      </map>
+    </environment>
+    <proxy>https://mirrors.aliyun.com/goproxy/</proxy>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2950" y="655" key="#GOROOT" timestamp="1590041478802">
+      <screen x="1920" y="23" width="2560" height="1417" />
+    </state>
+    <state x="2950" y="655" key="#GOROOT/0.23.1920.1057/1920.23.2560.1417@1920.23.2560.1417" timestamp="1590041478802" />
+    <state width="2508" height="115" key="GridCell.Tab.0.bottom" timestamp="1590051879292">
+      <screen x="1920" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2508" height="115" key="GridCell.Tab.0.bottom/0.23.1920.1057/1920.23.2560.1417@1920.23.2560.1417" timestamp="1590051879292" />
+    <state width="2508" height="115" key="GridCell.Tab.0.center" timestamp="1590051879292">
+      <screen x="1920" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2508" height="115" key="GridCell.Tab.0.center/0.23.1920.1057/1920.23.2560.1417@1920.23.2560.1417" timestamp="1590051879292" />
+    <state width="2508" height="115" key="GridCell.Tab.0.left" timestamp="1590051879291">
+      <screen x="1920" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2508" height="115" key="GridCell.Tab.0.left/0.23.1920.1057/1920.23.2560.1417@1920.23.2560.1417" timestamp="1590051879291" />
+    <state width="2508" height="115" key="GridCell.Tab.0.right" timestamp="1590051879292">
+      <screen x="1920" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2508" height="115" key="GridCell.Tab.0.right/0.23.1920.1057/1920.23.2560.1417@1920.23.2560.1417" timestamp="1590051879292" />
+  </component>
+</project>
