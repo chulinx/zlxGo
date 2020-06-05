@@ -39,3 +39,32 @@ $ ./config
 redis:127.0.0.1:6379
 es:http://10.6.201.133:49200
 ```
+#### Terminal 
+```go
+package main
+import (
+    "fmt"
+    zssh "github.com/chulinx/zlxGo/ssh"
+    "golang.org/x/crypto/ssh"
+)
+func main() {
+	sshConfig := &ssh.ClientConfig{
+		User: "vagrant",
+		Auth: []ssh.AuthMethod{
+			ssh.Password("vagrant"),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+
+	client, err := ssh.Dial("tcp", "127.0.0.1:2222", sshConfig)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer client.Close()
+
+	err = zssh.NewTerminal(client)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+```
