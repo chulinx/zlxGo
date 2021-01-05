@@ -1,4 +1,4 @@
-module github.com/chulinx/zlxGo/
+module github.com/chulinx/zlxGo
 
 go 1.12
 
