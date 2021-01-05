@@ -20,7 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5ff5aa9b-faa9-4b3f-94fb-429bb5d09d23" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/assert/assert.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,9 +49,12 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/Cellar/go/1.15/libexec" />
+  <component name="GOROOT" url="file://C:/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="3h2g4kbe" />
   </component>
   <component name="ProjectId" id="1c4TFkFJVqkAM79TkcLykxDEVm5" />
   <component name="ProjectViewState">
@@ -61,6 +65,7 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="GO_FMT" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
@@ -103,6 +108,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="sync code" />
@@ -116,11 +122,5 @@
       </map>
     </environment>
     <proxy>https://mirrors.aliyun.com/goproxy/</proxy>
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="640" y="473" key="#GOROOT" timestamp="1604712561331">
-      <screen x="0" y="23" width="1680" height="1027" />
-    </state>
-    <state x="640" y="473" key="#GOROOT/0.23.1680.1027@0.23.1680.1027" timestamp="1604712561331" />
   </component>
 </project>
