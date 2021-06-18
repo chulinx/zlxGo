@@ -6,9 +6,9 @@ import (
 )
 
 type Client struct {
-	user    string
-	pwd     string
-	addr    string
+	User    string
+	Pwd     string
+	Addr    string
 	client  *ssh.Client
 	session *ssh.Session
 	LastResult string
