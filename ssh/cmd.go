@@ -17,10 +17,10 @@ type Client struct {
 func (c *Client) Connect() (*Client, error) {
 	config := &ssh.ClientConfig{}
 	config.SetDefaults()
-	config.User = c.user
-	config.Auth = []ssh.AuthMethod{ssh.Password(c.pwd)}
+	config.User = c.User
+	config.Auth = []ssh.AuthMethod{ssh.Password(c.Pwd)}
 	config.HostKeyCallback = func(hostname string, remote net.Addr, key ssh.PublicKey) error { return nil }
-	client, err := ssh.Dial("tcp", c.addr, config)
+	client, err := ssh.Dial("tcp", c.Addr, config)
 	if nil != err {
 		return c, err
 	}
