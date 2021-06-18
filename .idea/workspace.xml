@@ -19,7 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ff5aa9b-faa9-4b3f-94fb-429bb5d09d23" name="Default Changelist" comment="">
+    <list default="true" id="5ff5aa9b-faa9-4b3f-94fb-429bb5d09d23" name="Default Changelist" comment="sync code">
+      <change afterPath="$PROJECT_DIR$/ssh/cmd.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -73,7 +74,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="go.vgo" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RunManager">
     <configuration name="TestYaml in github.com/tianyazc/zlxGo/zlxmodule/yaml" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
