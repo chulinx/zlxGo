@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"fmt"
 	"golang.org/x/crypto/ssh"
 	"net"
 )
@@ -39,7 +40,8 @@ func (c Client) Run(shell string) (string, error) {
 		return "", err
 	}
 	defer session.Close()
-	buf, err := session.CombinedOutput("sh -c "+shell)
+	cmd := fmt.Sprintf("sh -c \"%s\"",shell)
+	buf, err := session.CombinedOutput(cmd)
 
 	c.LastResult = string(buf)
 	return c.LastResult, err
