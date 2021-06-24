@@ -4,15 +4,29 @@ import (
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"net"
+	"strconv"
+	"strings"
 )
 
 type Client struct {
 	User    string
 	Pwd     string
-	Addr    string
+	Addr    string	// address format ip:port
 	client  *ssh.Client
 	session *ssh.Session
-	LastResult string
+	lastResult string
+}
+
+func NewSSHClient(user,pass,addr string) *Client {
+	_,err := strconv.Atoi(strings.Split(addr,":")[1])
+	if err != nil {
+		fmt.Printf("addr format ip:port\n")
+	}
+	return &Client{
+		User: user,
+		Pwd: pass,
+		Addr: addr,
+	}
 }
 
 func (c *Client) Connect() (*Client, error) {
@@ -43,6 +57,6 @@ func (c Client) Run(shell string) (string, error) {
 	cmd := fmt.Sprintf("sh -c \"%s\"",shell)
 	buf, err := session.CombinedOutput(cmd)
 
-	c.LastResult = string(buf)
-	return c.LastResult, err
+	c.lastResult = string(buf)
+	return c.lastResult, err
 }
