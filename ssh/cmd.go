@@ -18,9 +18,13 @@ type Client struct {
 }
 
 func NewSSHClient(user,pass,addr string) *Client {
-	_,err := strconv.Atoi(strings.Split(addr,":")[1])
+	addrList := strings.Split(addr,":")
+	if len(addrList) < 2 {
+		panic("addr format ip:port")
+	}
+	_,err := strconv.Atoi(addrList[1])
 	if err != nil {
-		fmt.Printf("addr format ip:port\n")
+		panic("addr format ip:port")
 	}
 	return &Client{
 		User: user,

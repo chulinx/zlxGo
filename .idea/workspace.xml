@@ -20,9 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5ff5aa9b-faa9-4b3f-94fb-429bb5d09d23" name="Default Changelist" comment="sync code">
-      <change afterPath="$PROJECT_DIR$/ssh/cmd_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ssh/cmd.go" beforeDir="false" afterPath="$PROJECT_DIR$/ssh/cmd.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
