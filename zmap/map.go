@@ -1,7 +1,7 @@
 package zmap
 
-func MergeMap(mObj ...map[string]interface{}) map[string]interface{} {
-	newObj := map[string]interface{}{}
+func MergeMap(mObj ...map[interface{}]interface{}) map[interface{}]interface{} {
+	newObj := map[interface{}]interface{}{}
 	for _, m := range mObj {
 		for k, v := range m {
 			newObj[k] = v
