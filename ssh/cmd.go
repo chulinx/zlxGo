@@ -4,24 +4,24 @@ import (
 	"fmt"
 )
 
-// sAuth ssh config
-type sAuth struct {
+// SAuth ssh config
+type SAuth struct {
 	user       string
 	privateKey string
 	pass       string
 	addr       string // address format ip:port
 }
 
-func NewAuthPass(user, pass, addr string) *sAuth {
-	return &sAuth{
+func NewAuthPass(user, pass, addr string) *SAuth {
+	return &SAuth{
 		user: user,
 		pass: pass,
 		addr: addr,
 	}
 }
 
-func NewAuthPrivateKey(user, privateKey, addr string) *sAuth {
-	return &sAuth{
+func NewAuthPrivateKey(user, privateKey, addr string) *SAuth {
+	return &SAuth{
 		user:       user,
 		privateKey: privateKey,
 		addr:       addr,
