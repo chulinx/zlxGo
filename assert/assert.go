@@ -2,9 +2,9 @@ package assert
 
 import "testing"
 
-func AssertEqualExpect(expect,actual interface{},test *testing.T)  {
+func AssertEqualExpect(expect, actual interface{}, test *testing.T) {
 	if expect == actual {
-		test.Logf("expect:%s==actual%s,Success",expect,actual)
+		test.Logf("expect:%s==actual%s,Success", expect, actual)
 		return
 	}
 	test.Fatalf("expect:%s!=actual%s,Failed")

@@ -21,9 +21,10 @@ func (color Color) Green(text string) string {
 
 // 黄色
 
-func (color Color)Yellow(text string) string  {
+func (color Color) Yellow(text string) string {
 	return "\033[33m" + text + "\033[0m"
 }
+
 //下划线
 func (color Color) Underline(text string) string {
 	return "\033[4m" + text + "\033[0m"

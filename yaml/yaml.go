@@ -17,7 +17,7 @@ func NewConfig(configPath string) *Config {
 	}
 }
 
-func NewDefaultConfigGet(path string) *Result  {
+func NewDefaultConfigGet(path string) *Result {
 	c := NewConfig("./etc/config.yaml")
 	return c.Get(path)
 }
@@ -40,9 +40,8 @@ func (c *Config) ConfigParse() (map[interface{}]interface{}, error) {
 	return m, nil
 }
 
-
 type Result struct {
-	res interface{}
+	res   interface{}
 	error error
 }
 
@@ -52,8 +51,8 @@ func (c *Config) Get(path string) *Result {
 	configs, err := c.ConfigParse()
 	if err != nil {
 		return &Result{
-			res: "",
-			error:err,
+			res:   "",
+			error: err,
 		}
 	}
 	var p = make(map[string]interface{})
@@ -72,31 +71,31 @@ func (c *Config) Get(path string) *Result {
 		}
 	}
 	return &Result{
-		res:r,
+		res:   r,
 		error: nil,
 	}
 }
 
-func (r *Result)Result() interface{}  {
+func (r *Result) Result() interface{} {
 	return r.res
 }
 
-func (r *Result)Int() int  {
+func (r *Result) Int() int {
 	return r.res.(int)
 }
 
-func (r *Result)Uint8() uint8  {
+func (r *Result) Uint8() uint8 {
 	return r.res.(uint8)
 }
 
-func (r *Result)String() string {
+func (r *Result) String() string {
 	return r.res.(string)
 }
 
-func (r *Result)Bool() bool  {
+func (r *Result) Bool() bool {
 	return r.res.(bool)
 }
 
-func (r *Result)Error() error {
+func (r *Result) Error() error {
 	return r.error
 }

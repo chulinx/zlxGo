@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type SSHTerminal struct {
+type Terminal struct {
 	Session *ssh.Session
 	exitMsg string
 	stdout  io.Reader
@@ -19,9 +19,7 @@ type SSHTerminal struct {
 	stderr  io.Reader
 }
 
-
-
-func (t *SSHTerminal) updateTerminalSize() {
+func (t *Terminal) updateTerminalSize() {
 
 	go func() {
 		// SIGWINCH is sent to the process when the window size of the terminal has
@@ -64,7 +62,7 @@ func (t *SSHTerminal) updateTerminalSize() {
 
 }
 
-func (t *SSHTerminal) interactiveSession() error {
+func (t *Terminal) interactiveSession() error {
 
 	defer func() {
 		if t.exitMsg == "" {
@@ -148,7 +146,7 @@ func NewTerminal(client *ssh.Client) error {
 	}
 	defer session.Close()
 
-	s := SSHTerminal{
+	s := Terminal{
 		Session: session,
 	}
 
@@ -159,8 +157,8 @@ func NewTerminal(client *ssh.Client) error {
 /*
 func main() {
 	sshConfig := &ssh.ClientConfig{
-		User: "vagrant",
-		Auth: []ssh.AuthMethod{
+		user: "vagrant",
+		sAuth: []ssh.AuthMethod{
 			ssh.Password("vagrant"),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
