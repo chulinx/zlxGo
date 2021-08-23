@@ -158,7 +158,7 @@ func NewTerminal(client *ssh.Client) error {
 func main() {
 	sshConfig := &ssh.ClientConfig{
 		user: "vagrant",
-		sAuth: []ssh.AuthMethod{
+		SAuth: []ssh.AuthMethod{
 			ssh.Password("vagrant"),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),

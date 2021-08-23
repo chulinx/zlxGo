@@ -10,13 +10,13 @@ import (
 )
 
 type Client struct {
-	*sAuth
+	*SAuth
 	client     *ssh.Client
 	session    *ssh.Session
 	lastResult string
 }
 
-func NewSSHClient(auth *sAuth) *Client {
+func NewSSHClient(auth *SAuth) *Client {
 	addrList := strings.Split(auth.addr, ":")
 	if len(addrList) < 2 {
 		panic("addr format ip:port")
@@ -26,7 +26,7 @@ func NewSSHClient(auth *sAuth) *Client {
 		panic("addr format ip:port")
 	}
 	return &Client{
-		sAuth: &sAuth{
+		SAuth: &SAuth{
 			user:       auth.user,
 			pass:       auth.pass,
 			addr:       auth.addr,
