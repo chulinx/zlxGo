@@ -18,13 +18,13 @@ func TestClient_ScpFile(t *testing.T) {
 		{
 			name: "scp file",
 			args: args{
-				srcPath:  "/Users/zhangxiang/docker-compose.yml",
-				destPath: "/tmp/docker-compose.yml",
+				srcPath:  "/Users/zhangsan/zlxgo/go.mod",
+				destPath: "/tmp/",
 			},
 			wantErr: false,
 		},
 	}
-	auth := NewAuthPass("zhangsan", "xxx", "10.229.3.217:22")
+	auth := NewAuthPass("zhangsan", "sadazx", "10.229.3.217:22")
 	c := NewSSHClient(auth)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -54,7 +54,7 @@ func TestClient_ScpFileExecute(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	auth := NewAuthPass("zhangsan", "sssxxxxx", "10.229.3.217:22")
+	auth := NewAuthPass("zhangsan", "xxzssa", "10.229.3.217:22")
 	c := NewSSHClient(auth)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
