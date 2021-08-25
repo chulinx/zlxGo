@@ -8,6 +8,10 @@ import (
 )
 
 func (c *Client) ScpFile(srcPath, destPath string) error {
+	// file not exits return
+	if _, err := os.Stat(srcPath); err != nil && os.IsNotExist(err) {
+		return err
+	}
 	sshClient, err := c.Connect()
 	if err != nil {
 		return err
