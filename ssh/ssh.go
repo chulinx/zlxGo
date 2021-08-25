@@ -74,7 +74,7 @@ func (c *Client) auth() (ssh.AuthMethod, error) {
 }
 
 func (c *Client) Close() {
-	err := c.session.Close()
+	err := c.client.Close()
 	if err != nil {
 		return
 	}
