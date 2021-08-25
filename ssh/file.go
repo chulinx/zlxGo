@@ -9,7 +9,6 @@ import (
 
 func (c *Client) ScpFile(srcPath, destPath string) error {
 	sshClient, err := c.Connect()
-	defer sshClient.client.Close()
 	if err != nil {
 		return err
 	}

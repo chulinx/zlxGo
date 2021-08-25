@@ -38,7 +38,6 @@ func (c Client) Run(shell string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer session.Close()
 	cmd := fmt.Sprintf("sh -c \"%s\"", shell)
 	buf, err := session.CombinedOutput(cmd)
 

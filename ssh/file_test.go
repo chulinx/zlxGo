@@ -23,7 +23,7 @@ func TestClient_ScpFile(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	auth := NewAuthPass("zhangxiang1", "_79QP13zm5g", "10.229.3.217:22")
+	auth := NewAuthPass("zhangsan", "xxx", "10.229.3.217:22")
 	c := NewSSHClient(auth)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

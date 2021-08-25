@@ -72,3 +72,10 @@ func (c *Client) auth() (ssh.AuthMethod, error) {
 	}
 	return nil, errors.New("Auth type not support ")
 }
+
+func (c *Client) Close() {
+	err := c.session.Close()
+	if err != nil {
+		return
+	}
+}
