@@ -1,7 +1,12 @@
 package ssh
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"golang.org/x/crypto/ssh"
+	"io"
+	"strings"
 )
 
 // SAuth ssh config
@@ -28,7 +33,19 @@ func NewAuthPrivateKey(user, privateKey, addr string) *SAuth {
 	}
 }
 
-func (c Client) Run(shell string) (string, error) {
+func (c *Client) RunCmdSudo(shell string) (string, error) {
+	if c.pass == "" {
+		return "", errors.New("Sudo no allow type privateKey run ")
+	}
+	return c.runCmd(shell, true)
+}
+
+func (c *Client) RunCmd(shell string) (string, error) {
+	return c.runCmd(shell, false)
+}
+
+func (c *Client) runCmd(shell string, sudo bool) (string, error) {
+	var cmd string
 	if c.client == nil {
 		if _, err := c.Connect(); err != nil {
 			return "", err
@@ -38,9 +55,43 @@ func (c Client) Run(shell string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	cmd := fmt.Sprintf("sh -c \"%s\"", shell)
-	buf, err := session.CombinedOutput(cmd)
+	cmd = fmt.Sprintf("sh -c \"%s\"", shell)
+	if sudo {
+		cmd = fmt.Sprintf("sudo sh -c \"%s\"", shell)
+	}
 
-	c.lastResult = string(buf)
-	return c.lastResult, err
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0,     // disable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
+
+	err = session.RequestPty("xterm", 80, 40, modes)
+	if err != nil {
+		return "", err
+	}
+
+	stdoutB := new(bytes.Buffer)
+	session.Stdout = stdoutB
+	in, _ := session.StdinPipe()
+
+	passTip := fmt.Sprintf("[sudo] %s 的密码：", c.user)
+	go func(in io.Writer, output *bytes.Buffer) {
+		for {
+			if strings.Contains(string(output.Bytes()), passTip) {
+				_, err = in.Write([]byte(c.pass + "\n"))
+				if err != nil {
+					break
+				}
+				break
+			}
+		}
+	}(in, stdoutB)
+
+	err = session.Run(cmd)
+	if err != nil {
+		return "", err
+	}
+	s := strings.TrimSpace(strings.TrimPrefix(stdoutB.String(), passTip))
+	return s, nil
 }

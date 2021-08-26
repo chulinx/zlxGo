@@ -1,13 +1,16 @@
 package assert
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func AssertEqualExpect(expect, actual interface{}, test *testing.T) {
-	if expect == actual {
-		test.Logf("expect:%s==actual%s,Success", expect, actual)
+	if reflect.DeepEqual(expect, actual) {
+		test.Logf("expect:%s==actual:%s,Success", expect, actual)
 		return
 	}
-	test.Fatalf("expect:%s!=actual%s,Failed")
+	test.Fatalf("expect:%s!=actual:%s,Failed", expect, actual)
 }
 
 // 断言assert
@@ -19,8 +22,8 @@ func AssertBool(ok bool, t *testing.T) {
 	}
 }
 
-func AssertError(ok bool, err error, t *testing.T) {
-	if !ok {
+func AssertError(err error, t *testing.T) {
+	if err != nil {
 		t.Fatalf(err.Error())
 	} else {
 		t.Logf("Success")

@@ -7,12 +7,20 @@ import (
 )
 
 func (c *Client) ScpFile(srcPath, destPath string) error {
-	var fileInfo os.FileInfo
+	return c.scpFile(srcPath, destPath, false)
+}
+
+func (c *Client) scpFile(srcPath, destPath string, isRoot bool) error {
+	var (
+		fileInfo  os.FileInfo
+		clientOpt scp.ClientOption
+	)
+	clientOpt.Sudo = isRoot
 	sshClient, err := c.Connect()
 	if err != nil {
 		return err
 	}
-	scpClient, err := scp.NewClientFromExistingSSH(sshClient.client, &scp.ClientOption{})
+	scpClient, err := scp.NewClientFromExistingSSH(sshClient.client, &clientOpt)
 	if err != nil {
 		fmt.Println("Error creating new SSH session from existing connection", err)
 		return err
@@ -29,7 +37,6 @@ func (c *Client) ScpFile(srcPath, destPath string) error {
 			return nil
 		}
 	}
-
 	err = scpClient.CopyFileToRemote(srcPath, destPath, &scp.FileTransferOption{})
 	if err != nil {
 		return err

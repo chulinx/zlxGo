@@ -1,71 +1,34 @@
 package ssh
 
 import (
-	"fmt"
+	"github.com/chulinx/zlxGo/assert"
+	"github.com/chulinx/zlxGo/stringfile"
 	"testing"
 )
 
-func TestClient_ScpFile(t *testing.T) {
-	type args struct {
-		srcPath  string
-		destPath string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "scp file",
-			args: args{
-				srcPath:  "/Users/zhangsan/zlxgo/go.mod",
-				destPath: "/tmp/",
-			},
-			wantErr: false,
-		},
-	}
-	auth := NewAuthPass("zhangsan", "sadazx", "10.229.3.217:22")
-	c := NewSSHClient(auth)
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := c.ScpFile(tt.args.srcPath, tt.args.destPath); (err != nil) != tt.wantErr {
-				t.Errorf("ScpFile() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+var (
+	localFile  = "/Users/zhangxiang/index.html"
+	remoteFile = "/tmp/index.html"
+	content    = "hello world"
+)
+
+func TestClient_ScpFileWithPass(t *testing.T) {
+	scpFile(t, pwdAuth)
 }
 
-func TestClient_ScpFileExecute(t *testing.T) {
-	type args struct {
-		srcPath  string
-		destPath string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "scp file and run",
-			args: args{
-				srcPath:  "/Users/zhangsan/Desktop/Work/Code/ccwork/sretools/a.sh",
-				destPath: "/tmp/a.sh",
-			},
-			wantErr: false,
-		},
-	}
-	auth := NewAuthPass("zhangsan", "xxzssa", "10.229.3.217:22")
-	c := NewSSHClient(auth)
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := c.ScpFile(tt.args.srcPath, tt.args.destPath); (err != nil) != tt.wantErr {
-				t.Errorf("ScpFile() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if s, err := c.Run("sh " + tt.args.destPath); (err != nil) != tt.wantErr {
-				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
-			} else {
-				fmt.Println(s)
-			}
-		})
-	}
+func TestClient_ScpFileWithKey(t *testing.T) {
+	scpFile(t, pubKeyAuth)
+}
+
+func scpFile(t *testing.T, sAuth *SAuth) {
+	err := stringfile.RewriteFile(content, localFile)
+	assert.AssertError(err, t)
+	c := NewSSHClient(sAuth)
+	file, err := stringfile.ReadFile(localFile)
+	assert.AssertError(err, t)
+	err = c.ScpFile(localFile, remoteFile)
+	assert.AssertError(err, t)
+	cmd, err1 := c.RunCmd("cat " + remoteFile)
+	assert.AssertError(err1, t)
+	assert.AssertEqualExpect(file, cmd+"\n", t)
 }
