@@ -77,7 +77,7 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 
 	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.user)
 	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.user)
-	go func(in io.Writer, output *bytes.Buffer) {
+	go func(in io.Writer, output *bytes.Buffer, passTipEn, passTipCn string) {
 		for {
 			if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
 				_, err = in.Write([]byte(c.pass + "\n"))
@@ -87,7 +87,7 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 				break
 			}
 		}
-	}(in, stdoutB)
+	}(in, stdoutB, passTipEn, passTipCn)
 
 	err = session.Run(cmd)
 	if err != nil {
