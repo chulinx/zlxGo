@@ -75,10 +75,11 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 	session.Stdout = stdoutB
 	in, _ := session.StdinPipe()
 
-	passTip := fmt.Sprintf("[sudo] %s 的密码：", c.user)
+	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.user)
+	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.user)
 	go func(in io.Writer, output *bytes.Buffer) {
 		for {
-			if strings.Contains(string(output.Bytes()), passTip) {
+			if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
 				_, err = in.Write([]byte(c.pass + "\n"))
 				if err != nil {
 					break
@@ -92,6 +93,6 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	s := strings.TrimSpace(strings.TrimPrefix(stdoutB.String(), passTip))
+	s := strings.TrimSpace(strings.TrimPrefix(strings.TrimPrefix(stdoutB.String(), passTipCn), passTipEn))
 	return s, nil
 }
