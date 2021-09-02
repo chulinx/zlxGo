@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"io"
 	"strings"
+	"time"
 )
 
 // SAuth ssh config
@@ -86,6 +87,7 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 				}
 				break
 			}
+			time.Sleep(time.Microsecond * 100)
 		}
 	}(in, stdoutB, passTipEn, passTipCn)
 

@@ -26,6 +26,20 @@ func TestClient_RunWithPassPassPassTipEn(t *testing.T) {
 	assert.AssertEqualExpect(sudo, result, t)
 }
 
+func run() {
+	c := NewSSHClient(pwdAuth)
+	cmd := "echo hello world"
+	defer c.Close()
+	c.RunCmd(cmd)
+	c.RunCmdSudo(cmd)
+}
+
+func BenchmarkRunWithPassPassPassTipEn(b *testing.B) {
+	for i := 0; i < 10; i++ {
+		run()
+	}
+}
+
 func TestClient_RunWithPassPassTipCn(t *testing.T) {
 	c := NewSSHClient(pwdAuth1)
 	cmd, result := "echo hello world", "hello world"
