@@ -17,7 +17,7 @@ type Client struct {
 }
 
 func NewSSHClient(auth *SAuth) *Client {
-	addrList := strings.Split(auth.addr, ":")
+	addrList := strings.Split(auth.Addr, ":")
 	if len(addrList) < 2 {
 		panic("addr format ip:port")
 	}
@@ -27,11 +27,11 @@ func NewSSHClient(auth *SAuth) *Client {
 	}
 
 	auths := func() ssh.AuthMethod {
-		if auth.pass != "" {
-			return ssh.Password(auth.pass)
+		if auth.Pass != "" {
+			return ssh.Password(auth.Pass)
 		}
-		if auth.privateKey != "" {
-			authData, err := ioutil.ReadFile(auth.privateKey)
+		if auth.PrivateKey != "" {
+			authData, err := ioutil.ReadFile(auth.PrivateKey)
 			if err != nil {
 				return nil
 			}
@@ -46,13 +46,13 @@ func NewSSHClient(auth *SAuth) *Client {
 
 	client := func() *ssh.Client {
 		config := &ssh.ClientConfig{
-			User:            auth.user,
+			User:            auth.User,
 			Auth:            []ssh.AuthMethod{auths()},
 			HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error { return nil },
 			Timeout:         time.Second * 10,
 		}
 		config.SetDefaults()
-		client, err := ssh.Dial("tcp", auth.addr, config)
+		client, err := ssh.Dial("tcp", auth.Addr, config)
 		if nil != err {
 			return nil
 		}
@@ -60,12 +60,7 @@ func NewSSHClient(auth *SAuth) *Client {
 	}
 
 	return &Client{
-		SAuth: &SAuth{
-			user:       auth.user,
-			pass:       auth.pass,
-			addr:       auth.addr,
-			privateKey: auth.privateKey,
-		},
+		SAuth:  auth,
 		Client: client(),
 	}
 }
