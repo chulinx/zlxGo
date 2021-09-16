@@ -12,30 +12,30 @@ import (
 
 // SAuth ssh config
 type SAuth struct {
-	user       string
-	privateKey string
-	pass       string
-	addr       string // address format ip:port
+	User       string
+	PrivateKey string
+	Pass       string
+	Addr       string // address format ip:port
 }
 
 func NewAuthPass(user, pass, addr string) *SAuth {
 	return &SAuth{
-		user: user,
-		pass: pass,
-		addr: addr,
+		User: user,
+		Pass: pass,
+		Addr: addr,
 	}
 }
 
 func NewAuthPrivateKey(user, privateKey, addr string) *SAuth {
 	return &SAuth{
-		user:       user,
-		privateKey: privateKey,
-		addr:       addr,
+		User:       user,
+		PrivateKey: privateKey,
+		Addr:       addr,
 	}
 }
 
 func (c *Client) RunCmdSudo(shell string) (string, error) {
-	if c.pass == "" {
+	if c.Pass == "" {
 		return "", errors.New("Sudo no allow type privateKey run ")
 	}
 	return c.runCmd(shell, true)
@@ -71,12 +71,12 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 	session.Stdout = stdoutB
 	in, _ := session.StdinPipe()
 
-	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.user)
-	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.user)
+	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
+	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.User)
 	go func(in io.Writer, output *bytes.Buffer, passTipEn, passTipCn string) {
 		for {
 			if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
-				_, err = in.Write([]byte(c.pass + "\n"))
+				_, err = in.Write([]byte(c.Pass + "\n"))
 				if err != nil {
 					break
 				}
