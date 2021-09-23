@@ -68,7 +68,9 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 	}
 
 	stdoutB := new(bytes.Buffer)
+	stdoutA := new(bytes.Buffer)
 	session.Stdout = stdoutB
+	session.Stderr = stdoutA
 	in, _ := session.StdinPipe()
 
 	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
@@ -88,7 +90,7 @@ func (c *Client) runCmd(shell string, sudo bool) (string, error) {
 
 	err = session.Run(cmd)
 	if err != nil {
-		return "", err
+		return stdoutA.String(), err
 	}
 	s := strings.TrimSpace(strings.TrimPrefix(strings.TrimPrefix(stdoutB.String(), passTipCn), passTipEn))
 	return s, nil

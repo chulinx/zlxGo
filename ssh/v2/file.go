@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/povsister/scp"
+	"io"
 	"os"
 )
 
@@ -53,6 +54,19 @@ func (c *Client) CopyFileFromRemoteToByte(filePath string) (error, []byte) {
 		return err, nil
 	}
 	return err, buffer.Bytes()
+}
+
+func (c *Client) CopyFileFromRemote(filePath string, w io.Writer) error {
+	scpClient, err := scp.NewClientFromExistingSSH(c.Client, &scp.ClientOption{})
+	if err != nil {
+		fmt.Println("Error creating new SSH Session from existing connection", err)
+		return err
+	}
+	err = scpClient.CopyFromRemote(filePath, w, &scp.FileTransferOption{})
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 func (c *Client) CopyFileToRemoteFromByte(filePath string, b []byte) error {
