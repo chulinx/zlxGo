@@ -1,22 +1,43 @@
 package ssh
 
 import (
+	"fmt"
 	"github.com/chulinx/zlxGo/assert"
 	"testing"
 )
 
 var (
-	user           = "xxx"
-	pass           = "xxx"
+	user           = "zhangxiang1"
+	pass           = "_79QP13zm5g"
 	pubKeyAuthPath = "/Users/xxx/.ssh/id_rsa"
-	addr           = "10.229.3.217:22"
-	addr1          = "10.16.88.7:22"
+	addr           = "10.229.3.217:36000"
+	addr1          = "10.16.88.7:36000"
 
 	pwdAuth    = NewAuthPass(user, pass, addr)
 	pwdAuth1   = NewAuthPass(user, pass, addr1)
 	pubKeyAuth = NewAuthPrivateKey(user, pubKeyAuthPath, addr)
 )
 
+var tests = [][]string{
+	{"hello world", "echo hello world", "hello world"},
+	{"pipeline", "echo hello world|awk '{print \\$1}'", "hello"},
+	//{"foreach",`for i in "1 2 3";do echo ${i};done`,"1 2 3"},
+}
+
+func TestClient_RunWithPass(t *testing.T) {
+	c := NewSSHClient(pwdAuth)
+	for _, test := range tests {
+		name, cmd, result := test[0], test[1], test[2]
+		fmt.Printf("Test ssh run cmd %s\n", name)
+		runCmd, err := c.RunCmd(cmd)
+		fmt.Println(runCmd, err)
+		assert.AssertEqualExpect(runCmd, result, t)
+		fmt.Printf("Test sudo ssh run cmd %s\n", name)
+		sudo, err := c.RunCmdSudo(cmd)
+		fmt.Println(sudo, err)
+		assert.AssertEqualExpect(sudo, result, t)
+	}
+}
 func TestClient_RunWithPassPassPassTipEn(t *testing.T) {
 	c := NewSSHClient(pwdAuth)
 	cmd, result := "echo hello world", "hello world"
