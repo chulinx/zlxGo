@@ -38,18 +38,34 @@ func (c *Client) RunCmdSudo(shell string) (string, error) {
 	if c.Pass == "" {
 		return "", errors.New("Sudo no allow type privateKey run ")
 	}
-	return c.runCmd(shell, true)
+	return c.runCmd(shell, true, false)
+}
+
+func (c *Client) RunCmdWihScriptSudo(shell string) (string, error) {
+	return c.runCmd(shell, true, true)
 }
 
 func (c *Client) RunCmd(shell string) (string, error) {
-	return c.runCmd(shell, false)
+	return c.runCmd(shell, false, false)
 }
 
-func (c *Client) runCmd(shell string, sudo bool) (string, error) {
+func (c *Client) RunCmdWihScript(shell string) (string, error) {
+	return c.runCmd(shell, false, true)
+}
+
+func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 	var cmd string
 	session, err := c.Client.NewSession()
 	if err != nil {
 		return "", err
+	}
+	if scriptMode {
+		scriptFileName := fmt.Sprintf("/tmp/%d.sh", time.Now().Unix())
+		err := c.CopyFileToRemoteFromByte(scriptFileName, []byte(shell))
+		if err != nil {
+			return "", err
+		}
+		shell = fmt.Sprintf("sh %s", scriptFileName)
 	}
 	cmd = fmt.Sprintf("sh -c \"%s\"", shell)
 	if sudo {

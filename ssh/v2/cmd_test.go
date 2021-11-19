@@ -47,6 +47,9 @@ func TestClient_RunWithPassPassTipCn(t *testing.T) {
 	assert.AssertEqualExpect(runCmd, result, t)
 	sudo, _ := c.RunCmdSudo(cmd)
 	assert.AssertEqualExpect(sudo, result, t)
+	cmd2, result2 := `file="/root/1637301482.sh";touch $file;for i in $(ls $file);do echo $i|awk '{print $1}'|awk -F '.' '{print $1}';done`, "/root/1637301482"
+	r2, _ := c.RunCmdWihScriptSudo(cmd2)
+	assert.AssertEqualExpect(r2, result2, t)
 }
 
 func TestClient_RunWithPubKey(t *testing.T) {
@@ -54,6 +57,9 @@ func TestClient_RunWithPubKey(t *testing.T) {
 	cmd, result := "echo hello world", "hello world"
 	runCmd, _ := c.RunCmd(cmd)
 	assert.AssertEqualExpect(runCmd, result, t)
+	cmd1, result1 := `file="/tmp/1637301482.sh";touch $file;for i in $(ls $file);do echo $i|awk '{print $1}'|awk -F '.' '{print $1}';done`, "/tmp/1637301482"
+	r1, _ := c.RunCmdWihScript(cmd1)
+	assert.AssertEqualExpect(r1, result1, t)
 	_, err := c.RunCmdSudo(cmd)
 	assert.AssertEqualExpect(err.Error(), "Sudo no allow type privateKey run ", t)
 }
