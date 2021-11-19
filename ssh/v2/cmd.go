@@ -65,7 +65,10 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		shell = fmt.Sprintf("sh %s", scriptFileName)
+		if scriptFileName == "/" || scriptFileName == "/*" {
+			return "", errors.New("file name not allow / or /*")
+		}
+		shell = fmt.Sprintf("sh %s && rm -f %s", scriptFileName, scriptFileName)
 	}
 	cmd = fmt.Sprintf("sh -c \"%s\"", shell)
 	if sudo {
