@@ -53,7 +53,7 @@ func ReadFileLines(filePath string, lines int) (string, error) {
 
 // readLineToString 读取文件到字符串，line等于-1 返回文件所有内容，为正数，根据line的值返回最后几行
 func readLineToString(file string, line int) (string, error) {
-	f, err := os.Open(file)
+	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE, 0755)
 	defer f.Close()
 	if err != nil {
 		return "", err
