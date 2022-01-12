@@ -95,13 +95,13 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 
 	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
 	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.User)
+	// exit goroutine when execute function
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go func(in io.Writer, output *bytes.Buffer, passTipEn, passTipCn string) {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("协程退出")
 				return
 			default:
 				if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
