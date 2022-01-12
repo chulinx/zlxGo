@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/ssh"
@@ -94,14 +95,22 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 
 	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
 	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.User)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	go func(in io.Writer, output *bytes.Buffer, passTipEn, passTipCn string) {
 		for {
-			if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
-				_, err = in.Write([]byte(c.Pass + "\n"))
-				if err != nil {
+			select {
+			case <-ctx.Done():
+				fmt.Println("协程退出")
+				return
+			default:
+				if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
+					_, err = in.Write([]byte(c.Pass + "\n"))
+					if err != nil {
+						break
+					}
 					break
 				}
-				break
 			}
 			time.Sleep(time.Microsecond * 100)
 		}
