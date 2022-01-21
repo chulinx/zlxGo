@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"errors"
@@ -35,6 +36,19 @@ func NewAuthPrivateKey(user, privateKey, addr string) *SAuth {
 	}
 }
 
+// RunCmdSudoStream the c.User must have sudo permission
+func (c *Client) RunCmdSudoStream(w io.Writer, shell string) error {
+	if c.Pass == "" {
+		return errors.New("Sudo no allow type privateKey run ")
+	}
+	return c.runCmdStream(w, shell, true)
+}
+
+func (c *Client) RunCmdStream(w io.Writer, shell string) error {
+	return c.runCmdStream(w, shell, false)
+}
+
+// RunCmdSudo the c.User must have sudo permission
 func (c *Client) RunCmdSudo(shell string) (string, error) {
 	if c.Pass == "" {
 		return "", errors.New("Sudo no allow type privateKey run ")
@@ -42,38 +56,35 @@ func (c *Client) RunCmdSudo(shell string) (string, error) {
 	return c.runCmd(shell, true, false)
 }
 
-func (c *Client) RunCmdWihScriptSudo(shell string) (string, error) {
-	return c.runCmd(shell, true, true)
-}
-
 func (c *Client) RunCmd(shell string) (string, error) {
 	return c.runCmd(shell, false, false)
+}
+
+// RunCmdWihScriptSudo the c.User must have sudo permission
+func (c *Client) RunCmdWihScriptSudo(shell string) (string, error) {
+	if c.Pass == "" {
+		return "", errors.New("Sudo no allow type privateKey run ")
+	}
+	return c.runCmd(shell, true, true)
 }
 
 func (c *Client) RunCmdWihScript(shell string) (string, error) {
 	return c.runCmd(shell, false, true)
 }
 
+// runCmd runs a command, return stdout or stderr after the command exec completion
 func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
-	var cmd string
+
+	if c.Client == nil {
+		return "", errors.New("init ssh client failed")
+	}
 	session, err := c.Client.NewSession()
 	if err != nil {
 		return "", err
 	}
-	if scriptMode {
-		scriptFileName := fmt.Sprintf("/tmp/%d.sh", time.Now().Unix())
-		err := c.CopyFileToRemoteFromByte(scriptFileName, []byte(shell))
-		if err != nil {
-			return "", err
-		}
-		if scriptFileName == "/" || scriptFileName == "/*" {
-			return "", errors.New("file name not allow / or /*")
-		}
-		shell = fmt.Sprintf("sh %s && rm -f %s", scriptFileName, scriptFileName)
-	}
-	cmd = fmt.Sprintf("sh -c \"%s\"", shell)
-	if sudo {
-		cmd = fmt.Sprintf("sudo sh -c \"%s\"", shell)
+	cmd, err2 := c.makeCmd(shell, sudo, scriptMode)
+	if err2 != nil {
+		return "", err2
 	}
 
 	modes := ssh.TerminalModes{
@@ -98,23 +109,8 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 	// exit goroutine when execute function
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go func(in io.Writer, output *bytes.Buffer, passTipEn, passTipCn string) {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
-					_, err = in.Write([]byte(c.Pass + "\n"))
-					if err != nil {
-						break
-					}
-					break
-				}
-			}
-			time.Sleep(time.Microsecond * 100)
-		}
-	}(in, stdoutB, passTipEn, passTipCn)
+	// input sudo password
+	go c.sudoPass(in, stdoutB, passTipEn, passTipCn, ctx, err)
 
 	err = session.Run(cmd)
 	if err != nil {
@@ -122,4 +118,138 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 	}
 	s := strings.TrimSpace(strings.TrimPrefix(strings.TrimPrefix(stdoutB.String(), passTipCn), passTipEn))
 	return s, nil
+}
+
+func (c *Client) runCmdStream(w io.Writer, cmd string, sudo bool) error {
+	cmd, err := c.makeCmd(cmd, sudo, false)
+	if err != nil {
+		return err
+	}
+	if c.Client == nil {
+		return errors.New("init ssh client failed")
+	}
+	session, err := c.Client.NewSession()
+	if err != nil {
+		return err
+	}
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0,     // disable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
+
+	err = session.RequestPty("xterm", 80, 40, modes)
+	if err != nil {
+		return err
+	}
+	in, _ := session.StdinPipe()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	stdout, err := session.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	go c.copyStdout(ctx, in, stdout, w, sudo)
+
+	err = session.Start(cmd)
+	if err != nil {
+		return err
+	}
+	err = session.Wait()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// sudoPass input pass when ask sudo pass
+func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, passTipCn string, ctx context.Context, err error) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
+				_, err = in.Write([]byte(c.Pass + "\n"))
+				if err != nil {
+					break
+				}
+				break
+			}
+		}
+		time.Sleep(time.Microsecond * 100)
+	}
+}
+
+// copyStdout copy session.StdoutPipe to io.Writer
+func (c *Client) copyStdout(ctx context.Context, in io.Writer, stdout io.Reader, w io.Writer, sudo bool) error {
+	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
+	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.User)
+	select {
+	case <-ctx.Done():
+		return nil
+	default:
+		// if sudo
+		if sudo {
+			var output []byte
+			select {
+			case <-ctx.Done():
+				return nil
+			default:
+				var (
+					r = bufio.NewReader(stdout)
+				)
+				for {
+					b, err := r.ReadByte()
+					if err != nil {
+						break
+					}
+					output = append(output, b)
+					if b == byte('\n') {
+						continue
+					}
+
+					if strings.Contains(string(output), passTipCn) || strings.Contains(string(output), passTipEn) {
+						_, err = in.Write([]byte(c.Pass + "\n"))
+						if err != nil {
+							continue
+						}
+						break
+					}
+
+				}
+			}
+		}
+
+		_, err := io.Copy(w, stdout)
+		if err != nil {
+			return err
+		}
+
+	}
+	return nil
+}
+
+// makeCmd generate command
+// if sudo is true, add sudo before cmd
+// if scriptMode is true,copy shell content to remote host and exec, finally delete it
+func (c *Client) makeCmd(shell string, sudo bool, scriptMode bool) (string, error) {
+	var cmd string
+	if scriptMode {
+		scriptFileName := fmt.Sprintf("/tmp/%d.sh", time.Now().Unix())
+		err := c.CopyFileToRemoteFromByte(scriptFileName, []byte(shell))
+		if err != nil {
+			return "", err
+		}
+		if scriptFileName == "/" || scriptFileName == "/*" {
+			return "", errors.New("file name not allow / or /*")
+		}
+		shell = fmt.Sprintf("sh %s && rm -f %s", scriptFileName, scriptFileName)
+	}
+	cmd = fmt.Sprintf("sh -c \"%s\"", shell)
+	if sudo {
+		cmd = fmt.Sprintf("sudo sh -c \"%s\"", shell)
+	}
+	return cmd, nil
 }

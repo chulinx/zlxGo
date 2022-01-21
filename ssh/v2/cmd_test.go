@@ -1,7 +1,9 @@
 package ssh
 
 import (
+	"fmt"
 	"github.com/chulinx/zlxGo/assert"
+	"os"
 	"testing"
 )
 
@@ -62,4 +64,19 @@ func TestClient_RunWithPubKey(t *testing.T) {
 	assert.AssertEqualExpect(r1, result1, t)
 	_, err := c.RunCmdSudo(cmd)
 	assert.AssertEqualExpect(err.Error(), "Sudo no allow type privateKey run ", t)
+}
+
+func TestClient_RunCmdStream(t *testing.T) {
+	c := NewSSHClient(pwdAuth1)
+	err := c.RunCmdStream(os.Stdout, "tail -f /tmp/test.log")
+	if err != nil {
+		fmt.Println("err：", err)
+	}
+}
+func TestClient_RunCmdSudoStream(t *testing.T) {
+	c := NewSSHClient(pwdAuth1)
+	err := c.RunCmdSudoStream(os.Stdout, "tail -f /var/log/messages")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
