@@ -37,15 +37,15 @@ func NewAuthPrivateKey(user, privateKey, addr string) *SAuth {
 }
 
 // RunCmdSudoStream the c.User must have sudo permission
-func (c *Client) RunCmdSudoStream(w io.Writer, shell string) error {
+func (c *Client) RunCmdSudoStream(textChan chan string, shell string) error {
 	if c.Pass == "" {
 		return errors.New("Sudo no allow type privateKey run ")
 	}
-	return c.runCmdStream(w, shell, true)
+	return c.runCmdStream(textChan, shell, true)
 }
 
-func (c *Client) RunCmdStream(w io.Writer, shell string) error {
-	return c.runCmdStream(w, shell, false)
+func (c *Client) RunCmdStream(textChan chan string, shell string) error {
+	return c.runCmdStream(textChan, shell, false)
 }
 
 // RunCmdSudo the c.User must have sudo permission
@@ -120,7 +120,7 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 	return s, nil
 }
 
-func (c *Client) runCmdStream(w io.Writer, cmd string, sudo bool) error {
+func (c *Client) runCmdStream(textChan chan string, cmd string, sudo bool) error {
 	cmd, err := c.makeCmd(cmd, sudo, false)
 	if err != nil {
 		return err
@@ -150,7 +150,7 @@ func (c *Client) runCmdStream(w io.Writer, cmd string, sudo bool) error {
 	if err != nil {
 		return err
 	}
-	go c.copyStdout(ctx, in, stdout, w, sudo)
+	go c.copyStdout(ctx, in, stdout, textChan, sudo)
 
 	err = session.Start(cmd)
 	if err != nil {
@@ -183,7 +183,7 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 }
 
 // copyStdout copy session.StdoutPipe to io.Writer
-func (c *Client) copyStdout(ctx context.Context, in io.Writer, stdout io.Reader, w io.Writer, sudo bool) error {
+func (c *Client) copyStdout(ctx context.Context, in io.Writer, stdout io.Reader, textChan chan string, sudo bool) error {
 	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
 	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.User)
 	select {
@@ -221,12 +221,11 @@ func (c *Client) copyStdout(ctx context.Context, in io.Writer, stdout io.Reader,
 				}
 			}
 		}
-
-		_, err := io.Copy(w, stdout)
-		if err != nil {
-			return err
+		scan := bufio.NewScanner(stdout)
+		scan.Split(bufio.ScanLines)
+		for scan.Scan() {
+			textChan <- scan.Text()
 		}
-
 	}
 	return nil
 }

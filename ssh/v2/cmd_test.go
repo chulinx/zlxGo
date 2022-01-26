@@ -3,7 +3,6 @@ package ssh
 import (
 	"fmt"
 	"github.com/chulinx/zlxGo/assert"
-	"os"
 	"testing"
 )
 
@@ -12,7 +11,7 @@ var (
 	pass           = "xxx"
 	pubKeyAuthPath = "/Users/xxx/.ssh/id_rsa"
 	addr           = "10.229.3.217:36000"
-	addr1          = "10.16.88.7:36000"
+	addr1          = "10.206.230.7:36000"
 
 	pwdAuth    = NewAuthPass(user, pass, addr)
 	pwdAuth1   = NewAuthPass(user, pass, addr1)
@@ -67,16 +66,28 @@ func TestClient_RunWithPubKey(t *testing.T) {
 }
 
 func TestClient_RunCmdStream(t *testing.T) {
+	var textChan = make(chan string, 10)
 	c := NewSSHClient(pwdAuth1)
-	err := c.RunCmdStream(os.Stdout, "tail -f /tmp/test.log")
-	if err != nil {
-		fmt.Println("err：", err)
+	go func() {
+		err := c.RunCmdStream(textChan, "tail -f /tmp/test.log")
+		if err != nil {
+			fmt.Println("err：", err)
+		}
+	}()
+	for text := range textChan {
+		fmt.Println(text)
 	}
 }
 func TestClient_RunCmdSudoStream(t *testing.T) {
+	var textChan = make(chan string, 10)
 	c := NewSSHClient(pwdAuth1)
-	err := c.RunCmdSudoStream(os.Stdout, "tail -f /var/log/messages")
-	if err != nil {
-		fmt.Println(err)
+	go func() {
+		err := c.RunCmdSudoStream(textChan, "tail -f /var/log/messages")
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+	for text := range textChan {
+		fmt.Println(text)
 	}
 }
