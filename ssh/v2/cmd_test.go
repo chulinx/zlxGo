@@ -1,9 +1,11 @@
 package ssh
 
 import (
+	"context"
 	"fmt"
 	"github.com/chulinx/zlxGo/assert"
 	"testing"
+	"time"
 )
 
 var (
@@ -66,28 +68,70 @@ func TestClient_RunWithPubKey(t *testing.T) {
 }
 
 func TestClient_RunCmdStream(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
 	var textChan = make(chan string, 10)
 	c := NewSSHClient(pwdAuth1)
 	go func() {
-		err := c.RunCmdStream(textChan, "tail -f /tmp/test.log")
+		err := c.RunCmdStream(ctx, textChan, "tail -f /tmp/test.log")
 		if err != nil {
 			fmt.Println("err：", err)
 		}
 	}()
-	for text := range textChan {
-		fmt.Println(text)
+	for {
+		if text, ok := <-textChan; ok == true { //ok=true表示通道未关闭
+			fmt.Println("读到数据：", text)
+		} else {
+			fmt.Println("通道已关闭，没有数据了")
+			break
+		}
 	}
 }
 func TestClient_RunCmdSudoStream(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
 	var textChan = make(chan string, 10)
 	c := NewSSHClient(pwdAuth1)
 	go func() {
-		err := c.RunCmdSudoStream(textChan, "tail -f /var/log/messages")
+		err := c.RunCmdSudoStream(ctx, textChan, "tail -f /var/log/messages")
 		if err != nil {
 			fmt.Println(err)
 		}
 	}()
-	for text := range textChan {
-		fmt.Println(text)
+	for {
+		if text, ok := <-textChan; ok == true { //ok=true表示通道未关闭
+			fmt.Println(text)
+		} else {
+			break
+		}
+	}
+}
+
+func TestSelectTest(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	//defer cancel()
+	type args struct {
+		ctx context.Context
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "select 1",
+			args: args{ctx: ctx},
+		},
+	}
+	go func() {
+		for {
+			time.Sleep(time.Second * 10)
+			cancel()
+			break
+		}
+	}()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SelectTest(tt.args.ctx)
+		})
 	}
 }

@@ -37,15 +37,15 @@ func NewAuthPrivateKey(user, privateKey, addr string) *SAuth {
 }
 
 // RunCmdSudoStream the c.User must have sudo permission
-func (c *Client) RunCmdSudoStream(textChan chan string, shell string) error {
+func (c *Client) RunCmdSudoStream(ctx context.Context, textChan chan string, shell string) error {
 	if c.Pass == "" {
 		return errors.New("Sudo no allow type privateKey run ")
 	}
-	return c.runCmdStream(textChan, shell, true)
+	return c.runCmdStream(ctx, textChan, shell, true)
 }
 
-func (c *Client) RunCmdStream(textChan chan string, shell string) error {
-	return c.runCmdStream(textChan, shell, false)
+func (c *Client) RunCmdStream(ctx context.Context, textChan chan string, shell string) error {
+	return c.runCmdStream(ctx, textChan, shell, false)
 }
 
 // RunCmdSudo the c.User must have sudo permission
@@ -120,7 +120,7 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 	return s, nil
 }
 
-func (c *Client) runCmdStream(textChan chan string, cmd string, sudo bool) error {
+func (c *Client) runCmdStream(ctx context.Context, textChan chan string, cmd string, sudo bool) error {
 	cmd, err := c.makeCmd(cmd, sudo, false)
 	if err != nil {
 		return err
@@ -144,18 +144,29 @@ func (c *Client) runCmdStream(textChan chan string, cmd string, sudo bool) error
 	}
 	in, _ := session.StdinPipe()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	stdout, err := session.StdoutPipe()
 	if err != nil {
 		return err
 	}
 	go c.copyStdout(ctx, in, stdout, textChan, sudo)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				err := session.Close()
+				if err != nil {
+					return
+				}
+			default:
+			}
+		}
+	}()
 
 	err = session.Start(cmd)
 	if err != nil {
 		return err
 	}
+
 	err = session.Wait()
 	if err != nil {
 		return err
@@ -186,48 +197,50 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 func (c *Client) copyStdout(ctx context.Context, in io.Writer, stdout io.Reader, textChan chan string, sudo bool) error {
 	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
 	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.User)
-	select {
-	case <-ctx.Done():
-		return nil
-	default:
-		// if sudo
-		if sudo {
-			var output []byte
-			select {
-			case <-ctx.Done():
-				return nil
-			default:
-				var (
-					r = bufio.NewReader(stdout)
-				)
-				for {
-					b, err := r.ReadByte()
-					if err != nil {
-						break
-					}
-					output = append(output, b)
-					if b == byte('\n') {
-						continue
-					}
-
-					if strings.Contains(string(output), passTipCn) || strings.Contains(string(output), passTipEn) {
-						_, err = in.Write([]byte(c.Pass + "\n"))
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+			// if sudo
+			if sudo {
+				var output []byte
+				select {
+				case <-ctx.Done():
+					return nil
+				default:
+					var (
+						r = bufio.NewReader(stdout)
+					)
+					for {
+						b, err := r.ReadByte()
 						if err != nil {
+							break
+						}
+						output = append(output, b)
+						if b == byte('\n') {
 							continue
 						}
-						break
-					}
 
+						if strings.Contains(string(output), passTipCn) || strings.Contains(string(output), passTipEn) {
+							_, err = in.Write([]byte(c.Pass + "\n"))
+							if err != nil {
+								continue
+							}
+							break
+						}
+
+					}
 				}
 			}
-		}
-		scan := bufio.NewScanner(stdout)
-		scan.Split(bufio.ScanLines)
-		for scan.Scan() {
-			textChan <- scan.Text()
+			scan := bufio.NewScanner(stdout)
+			scan.Split(bufio.ScanLines)
+			for scan.Scan() {
+				textChan <- scan.Text()
+			}
+			close(textChan)
 		}
 	}
-	return nil
 }
 
 // makeCmd generate command
@@ -251,4 +264,16 @@ func (c *Client) makeCmd(shell string, sudo bool, scriptMode bool) (string, erro
 		cmd = fmt.Sprintf("sudo sh -c \"%s\"", shell)
 	}
 	return cmd, nil
+}
+
+func SelectTest(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			fmt.Println("select test")
+			time.Sleep(time.Microsecond * 1000)
+		}
+	}
 }
