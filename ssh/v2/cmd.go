@@ -159,6 +159,7 @@ func (c *Client) runCmdStream(ctx context.Context, textChan chan string, cmd str
 				}
 			default:
 			}
+			time.Sleep(time.Millisecond * 100)
 		}
 	}()
 

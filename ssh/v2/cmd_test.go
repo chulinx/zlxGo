@@ -88,12 +88,13 @@ func TestClient_RunCmdStream(t *testing.T) {
 	}
 }
 func TestClient_RunCmdSudoStream(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	//ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	var textChan = make(chan string, 10)
 	c := NewSSHClient(pwdAuth1)
 	go func() {
-		err := c.RunCmdSudoStream(ctx, textChan, "tail -f /var/log/messages")
+		err := c.RunCmdSudoStream(ctx, textChan, "tail -f /home/log/cron.log")
 		if err != nil {
 			fmt.Println(err)
 		}
