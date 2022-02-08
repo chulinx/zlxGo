@@ -196,6 +196,7 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 
 // copyStdout copy session.StdoutPipe to io.Writer
 func (c *Client) copyStdout(ctx context.Context, in io.Writer, stdout io.Reader, textChan chan string, sudo bool) error {
+	defer close(textChan)
 	passTipCn := fmt.Sprintf("[sudo] %s 的密码：", c.User)
 	passTipEn := fmt.Sprintf("[sudo] password for %s:", c.User)
 	for {
@@ -239,7 +240,6 @@ func (c *Client) copyStdout(ctx context.Context, in io.Writer, stdout io.Reader,
 			for scan.Scan() {
 				textChan <- scan.Text()
 			}
-			close(textChan)
 		}
 	}
 }
