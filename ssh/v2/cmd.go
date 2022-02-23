@@ -83,6 +83,7 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 		return "", err
 	}
 	cmd, err2 := c.makeCmd(shell, sudo, scriptMode)
+	fmt.Println(cmd)
 	if err2 != nil {
 		return "", err2
 	}
@@ -121,6 +122,8 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 }
 
 func (c *Client) runCmdStream(ctx context.Context, textChan chan string, cmd string, sudo bool) error {
+	context, cancel := context.WithCancel(ctx)
+	defer cancel()
 	cmd, err := c.makeCmd(cmd, sudo, false)
 	if err != nil {
 		return err
@@ -148,11 +151,11 @@ func (c *Client) runCmdStream(ctx context.Context, textChan chan string, cmd str
 	if err != nil {
 		return err
 	}
-	go c.copyStdout(ctx, in, stdout, textChan, sudo)
+	go c.copyStdout(context, in, stdout, textChan, sudo)
 	go func() {
 		for {
 			select {
-			case <-ctx.Done():
+			case <-context.Done():
 				err := session.Close()
 				if err != nil {
 					return

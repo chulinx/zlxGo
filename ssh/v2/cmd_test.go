@@ -94,7 +94,7 @@ func TestClient_RunCmdSudoStream(t *testing.T) {
 	var textChan = make(chan string, 10)
 	c := NewSSHClient(pwdAuth1)
 	go func() {
-		err := c.RunCmdSudoStream(ctx, textChan, "tail -f /home/log/cron.log")
+		err := c.RunCmdSudoStream(ctx, textChan, "echo hello world")
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -103,6 +103,7 @@ func TestClient_RunCmdSudoStream(t *testing.T) {
 		if text, ok := <-textChan; ok == true { //ok=true表示通道未关闭
 			fmt.Println(text)
 		} else {
+			fmt.Println("通道关闭break")
 			break
 		}
 	}
