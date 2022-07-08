@@ -83,7 +83,6 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 		return "", err
 	}
 	cmd, err2 := c.makeCmd(shell, sudo, scriptMode)
-	fmt.Println(cmd)
 	if err2 != nil {
 		return "", err2
 	}
