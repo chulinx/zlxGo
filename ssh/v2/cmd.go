@@ -184,6 +184,10 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 		case <-ctx.Done():
 			return
 		default:
+			// output is "" break
+			if output.String() == "" {
+				break
+			}
 			if strings.Contains(string(output.Bytes()), passTipCn) || strings.Contains(string(output.Bytes()), passTipEn) {
 				_, err = in.Write([]byte(c.Pass + "\n"))
 				if err != nil {
