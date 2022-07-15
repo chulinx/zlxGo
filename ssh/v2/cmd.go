@@ -185,7 +185,11 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 			return
 		default:
 			// output is "" break
-			outSting := output.String()
+			outByte := output.Bytes()
+			if len(outByte) < 1 {
+				break
+			}
+			outSting := string(outByte)
 			if outSting == "<nil>" {
 				break
 			}
