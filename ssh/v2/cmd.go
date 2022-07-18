@@ -198,7 +198,7 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 				if err != nil {
 					break
 				}
-				break
+				return
 			}
 		}
 		time.Sleep(time.Microsecond * 100)
