@@ -189,6 +189,7 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 			if len(outByte) < 1 {
 				break
 			}
+			fmt.Println("output: ", output)
 			outSting := string(outByte)
 			if outSting == "<nil>" {
 				break
