@@ -110,8 +110,9 @@ func (c *Client) runCmd(shell string, sudo, scriptMode bool) (string, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	// input sudo password
-	go c.sudoPass(in, stdoutB, passTipEn, passTipCn, ctx, err)
-
+	if sudo {
+		go c.sudoPass(in, stdoutB, passTipEn, passTipCn, ctx, err)
+	}
 	err = session.Run(cmd)
 	if err != nil {
 		return stdoutA.String(), err
@@ -185,7 +186,9 @@ func (c *Client) sudoPass(in io.Writer, output *bytes.Buffer, passTipEn string, 
 			return
 		default:
 			// output is "" break
-			fmt.Println("output:", output.Len(), output.Cap())
+			if output.Len() == 0 || output.Cap() == 0 {
+				break
+			}
 			outSting := output.String()
 			if strings.Contains(outSting, passTipCn) || strings.Contains(outSting, passTipEn) {
 				_, err = in.Write([]byte(c.Pass + "\n"))
