@@ -8,7 +8,8 @@ require (
 	github.com/povsister/scp v0.0.0-20210427074412-33febfd9f13e
 	github.com/stretchr/testify v1.8.0 // indirect
 	go.uber.org/zap v1.19.1
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v3 v3.0.1
+	k8s.io/apimachinery v0.25.0
 )
