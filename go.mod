@@ -1,10 +1,10 @@
 module github.com/chulinx/zlxGo
 
-go 1.12
+go 1.13
 
 require (
 	github.com/BurntSushi/toml v1.2.0 // indirect
-	github.com/fsnotify/fsnotify v1.5.4
+	github.com/chromedp/chromedp v0.8.6
 	github.com/povsister/scp v0.0.0-20210427074412-33febfd9f13e
 	github.com/stretchr/testify v1.8.0 // indirect
 	go.uber.org/zap v1.19.1
