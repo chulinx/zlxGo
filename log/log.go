@@ -1,7 +1,6 @@
 package log
 
 import (
-	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -39,8 +38,11 @@ func newLog(params *LoggerParams) *zap.Logger {
 	return configLog("", params)
 }
 
-func configLog(serviceName string, params *LoggerParams) *zap.Logger {
-	hook := parseParams(params)
+func configLog(serviceName string, params *LoggerParams, option ...zap.Option) *zap.Logger {
+	var (
+		core zapcore.Core
+		hook = parseParams(params)
+	)
 
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
@@ -65,14 +67,19 @@ func configLog(serviceName string, params *LoggerParams) *zap.Logger {
 	var writerSyncer zapcore.WriteSyncer
 	if params.Filename == "" {
 		writerSyncer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout))
+		core = zapcore.NewCore(
+			zapcore.NewConsoleEncoder(encoderConfig), // 编码器配置
+			writerSyncer,
+			atomicLevel, // 日志级别
+		)
 	} else {
 		writerSyncer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(hook)) // 打印到控制台和文件
+		core = zapcore.NewCore(
+			zapcore.NewJSONEncoder(encoderConfig), // 编码器配置
+			writerSyncer,
+			atomicLevel, // 日志级别
+		)
 	}
-	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig), // 编码器配置
-		writerSyncer,
-		atomicLevel, // 日志级别
-	)
 
 	// 获取上层调用函数行号
 	skip := zap.AddCallerSkip(1)
@@ -80,15 +87,17 @@ func configLog(serviceName string, params *LoggerParams) *zap.Logger {
 	caller := zap.AddCaller()
 	// 开启文件及行号
 	development := zap.Development()
-	// 设置初始化字段
-	var filed zap.Option
 	if serviceName != "" {
-		filed = zap.Fields(zap.String("service", serviceName))
+		filed := zap.Fields(zap.String("service", serviceName))
 		// 构造日志
-		return zap.New(core, caller, skip, development, filed)
+		options := []zap.Option{caller, skip, development, filed}
+		options = append(options, option...)
+		return zap.New(core, options...)
 	}
 	// 构造日志
-	return zap.New(core, caller, skip, development)
+	options := []zap.Option{caller, skip, development}
+	options = append(options, option...)
+	return zap.New(core, options...)
 }
 
 func simpleLog(params *LoggerParams) *zap.Logger {
@@ -126,27 +135,6 @@ func simpleLog(params *LoggerParams) *zap.Logger {
 		atomicLevel, // 日志级别
 	)
 	return zap.New(core)
-}
-
-func EmojiFatalF(msg string, fields ...interface{}) {
-	printf("[❌] "+msg, fields...)
-}
-
-func EmojiSuccessF(msg string, fields ...interface{}) {
-	printf("[😉] "+msg, fields...)
-}
-
-func EmojiErrorF(msg string, fields ...interface{}) {
-	printf("[💔] "+msg, fields...)
-}
-
-func EmojiInfoF(msg string, fields ...interface{}) {
-	printf("[🙂] "+msg, fields...)
-}
-
-func printf(msg string, fields ...interface{}) {
-	s := fmt.Sprintf(msg, fields...)
-	EmojiLogger.Info(s)
 }
 
 func parseParams(params *LoggerParams) *LoggerParams {

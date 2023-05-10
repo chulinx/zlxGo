@@ -30,6 +30,9 @@ func TestInfo(t *testing.T) {
 			Debug(tt.args.msg, zap.Bool("registered", true))
 			EmojiInfoF("Enabled Server,Port: %d", 8888)
 			EmojiFatalF("ssss")
+			TermSuccess("Install success,service: %s", "webserver")
+			TermInfo("Install success,service: %s", "webserver")
+			TermDebug("Install success,service: %s", "webserver")
 		})
 	}
 }
