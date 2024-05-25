@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 )
 
 // LsofUsePid 获取pid的打开文件
@@ -13,13 +12,11 @@ func LsofUsePid(pid int) []string {
 	fdPath := filepath.Join("/proc", strconv.Itoa(pid), "fd")
 	fFiles, _ := os.ReadDir(fdPath)
 	for _, f := range fFiles {
-		if strings.Contains(f.Name(), "sock") {
-			fdPath, err := os.Readlink(filepath.Join(fdPath, f.Name()))
-			if err != nil {
-				continue
-			}
-			openFiles = append(openFiles, fdPath)
+		fdPath, err := os.Readlink(filepath.Join(fdPath, f.Name()))
+		if err != nil {
+			continue
 		}
+		openFiles = append(openFiles, fdPath)
 	}
 	return openFiles
 }
