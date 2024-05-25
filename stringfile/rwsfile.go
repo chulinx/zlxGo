@@ -2,7 +2,7 @@ package stringfile
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 )
@@ -58,7 +58,7 @@ func readLineToString(file string, line int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	s, err := ioutil.ReadAll(f)
+	s, err := io.ReadAll(f)
 	if err != nil {
 		return "", err
 	}
